@@ -93,8 +93,8 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
             if (prompt.length === 0) return;
             if (effectiveModel) chat.setModel(effectiveModel);
             void chat.send(prompt);
-            ui.setTextCapture(false);
-            inputRef.current?.blur();
+            // Keep the input focused so the next prompt needs no re-focus;
+            // Esc still blurs on demand, and send() no-ops while streaming.
           }}
           style={{ flexGrow: 1, flexBasis: 0 }}
         />
