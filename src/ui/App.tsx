@@ -94,11 +94,18 @@ export function App({ runtime }: { runtime: Runtime }) {
     }
 
     // 5. Text capture (chat/pull input focused): global hotkeys suppressed;
-    //    Escape blurs the input first, a second Escape leaves the view (§5).
+    //    Escape blurs the input, a second Escape leaves the view (§5).
+    //    Tab is the one safe exception while typing a chat prompt: it blurs
+    //    the input and cycles pane focus, so panes stay reachable without
+    //    escaping out of the conversation.
     if (state.textCapture) {
       if (key.name === "escape") {
         key.preventDefault();
         ui.setTextCapture(false);
+      } else if (key.name === "tab" && state.chatOpen && state.view === "main") {
+        key.preventDefault();
+        ui.setTextCapture(false);
+        ui.cyclePaneFocus(key.shift);
       }
       return;
     }
@@ -194,7 +201,10 @@ export function App({ runtime }: { runtime: Runtime }) {
 
       const modelsFocused = state.focusPane === "models";
       const logsFocused = state.focusPane === "logs";
-      const selected = models.getSnapshot().selected;
+      // The select's highlight syncs to the store only via onChange; on a
+      // fresh boot index 0 is highlighted but selected is still null.
+      const snap = models.getSnapshot();
+      const selected = snap.selected ?? snap.tags[0]?.name ?? null;
 
       if (logsFocused && (key.name === "g" || key.name === "end")) {
         key.preventDefault();
