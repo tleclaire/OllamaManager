@@ -93,7 +93,7 @@ export function InputPromptDialog({ ui }: DialogProps) {
             if (name.length > 0) prompt.onSubmit(name);
             else prompt.onCancel?.();
           }}
-          style={{ flexGrow: 1 }}
+          style={{ flexGrow: 1, flexBasis: 0 }}
         />
       </box>
       <text fg={theme.dim}>Enter confirm · Esc cancel</text>
@@ -139,6 +139,7 @@ export function ActionMenuDialog({ ui }: DialogProps) {
         onChange={() => {
           /* selection highlight only */
         }}
+        style={{ flexGrow: 1, flexBasis: 0 }}
       />
       <text fg={theme.dim}>Esc closes</text>
     </box>

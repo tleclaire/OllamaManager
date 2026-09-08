@@ -249,10 +249,13 @@ export function App({ runtime }: { runtime: Runtime }) {
   const mainFocused = (pane: "models" | "stats" | "logs") => view === "main" && focusPane === pane;
 
   return (
-    <box style={{ flexGrow: 1, flexDirection: "column", backgroundColor: theme.bg }}>
+    <box style={{ flexGrow: 1, flexBasis: 0, flexDirection: "column", backgroundColor: theme.bg }}>
       {view === "main" ? (
-        <box style={{ flexDirection: "column", flexGrow: 1 }}>
-          <box style={{ flexDirection: "row", flexGrow: 1 }}>
+        // flexBasis: 0 on every flexGrow child is MANDATORY with Yoga: with the
+        // default flexBasis "auto", a scrollbox's huge intrinsic content height
+        // drives flex-shrink and collapses sibling panes to a single row.
+        <box style={{ flexDirection: "column", flexGrow: 1, flexBasis: 0 }}>
+          <box style={{ flexDirection: "row", flexGrow: 1, flexBasis: 0 }}>
             <ModelsPane models={models} ui={ui} focused={mainFocused("models")} width="38%" />
             <StatsPane stats={stats} models={models} focused={mainFocused("stats")} flexGrow={1} />
           </box>

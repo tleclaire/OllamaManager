@@ -59,13 +59,13 @@ export function PullView({ pull, ui }: PullViewProps) {
             }
           }}
           onInput={() => ui.setTextCapture(true)}
-          style={{ flexGrow: 1 }}
+          style={{ flexGrow: 1, flexBasis: 0 }}
         />
       </box>
       <text fg={theme.dim}>
         Enter start · Esc blur input · Esc again leaves · a aborts (when input not focused)
       </text>
-      <box style={{ flexDirection: "column", flexGrow: 1 }}>
+      <box style={{ flexDirection: "column", flexGrow: 1, flexBasis: 0 }}>
         {entries.length === 0 ? (
           <text fg={theme.dim}>no pulls yet — type a model name and press Enter</text>
         ) : (

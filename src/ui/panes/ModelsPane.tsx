@@ -80,6 +80,7 @@ export function ModelsPane({ models, ui, focused, width }: ModelsPaneProps) {
             const name = (option?.value as string | undefined) ?? option?.name;
             if (name) models.select(name);
           }}
+          style={{ flexGrow: 1, flexBasis: 0 }}
         />
       )}
     </box>

@@ -43,7 +43,7 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
       titleColor={theme.borderFocused}
       style={{ flexGrow: 1, flexDirection: "column", padding: 1, gap: 1 }}
     >
-      <scrollbox focused={!inputFocused} stickyScroll stickyStart="bottom" style={{ flexGrow: 1 }}>
+      <scrollbox focused={!inputFocused} stickyScroll stickyStart="bottom" style={{ flexGrow: 1, flexBasis: 0 }}>
         {messages.length === 0 && !current ? (
           <text fg={theme.dim}>
             Type a prompt and press Enter. Press Esc to blur the input, then `a` aborts, `b` runs the preset benchmark.
@@ -95,7 +95,7 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
             ui.setTextCapture(false);
             inputRef.current?.blur();
           }}
-          style={{ flexGrow: 1 }}
+          style={{ flexGrow: 1, flexBasis: 0 }}
         />
       </box>
     </box>

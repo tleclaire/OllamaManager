@@ -17,7 +17,7 @@ interface StatusBarProps {
 function Dot({ label, status, detail }: { label: string; status: string; detail?: string }) {
   const color = statusColor(status);
   return (
-    <text>
+    <text style={{ flexShrink: 0 }}>
       <span fg={theme.dim}>{`${label} `}</span>
       <span fg={color}>●</span>
       <span fg={color}>{` ${status}`}</span>
@@ -39,7 +39,7 @@ export function StatusBar({ models, logs, stats }: StatusBarProps) {
       <Dot label="journal" status={journalStatus} />
       <Dot label="gpu" status={gpuStatus} />
       <Dot label="proc" status={procStatus} />
-      <box style={{ flexGrow: 1 }} />
+      <box style={{ flexGrow: 1, flexBasis: 0 }} />
       <text fg={theme.dim}>{HINT_LINE}</text>
     </box>
   );

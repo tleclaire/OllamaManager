@@ -51,7 +51,7 @@ export function DetailsView({ models, ui }: DetailsViewProps) {
           <text fg={theme.err}>{detailsError ?? "no details loaded"}</text>
         </box>
       ) : (
-        <scrollbox focused style={{ flexGrow: 1 }}>
+        <scrollbox focused style={{ flexGrow: 1, flexBasis: 0 }}>
           <Section title="overview" body={familyLine(shown)} />
           {capabilities ? <Section title="capabilities" body={capabilities} /> : null}
           <Section title="parameters" body={shown.parameters} />

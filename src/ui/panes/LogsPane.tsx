@@ -51,7 +51,7 @@ export function LogsPane({ logs, focused, flexGrow, scrollRef }: LogsPaneProps) 
       borderStyle="double"
       border
       {...paneBorder(focused)}
-      style={{ flexGrow, flexDirection: "column" }}
+      style={{ flexGrow, flexBasis: 0, flexDirection: "column" }}
     >
       {journalStatus === "unavailable" || journalStatus === "restarting" ? (
         <box style={{ paddingLeft: 1 }}>
@@ -72,7 +72,7 @@ export function LogsPane({ logs, focused, flexGrow, scrollRef }: LogsPaneProps) 
         focused={focused}
         stickyScroll
         stickyStart="bottom"
-        style={{ flexGrow: 1, rootOptions: { backgroundColor: theme.bg } }}
+        style={{ flexGrow: 1, flexBasis: 0, rootOptions: { backgroundColor: theme.bg } }}
       >
         {tail.length === 0 ? (
           <text fg={theme.dim}>

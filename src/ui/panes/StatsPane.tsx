@@ -48,7 +48,7 @@ export function StatsPane({ stats, models, focused, flexGrow }: StatsPaneProps) 
       borderStyle="double"
       border
       {...paneBorder(focused)}
-      style={{ flexGrow, flexDirection: "column", paddingLeft: 1, paddingRight: 1 }}
+      style={{ flexGrow, flexBasis: 0, flexDirection: "column", paddingLeft: 1, paddingRight: 1 }}
     >
       <Row label="GPU">
         {gpu && gpuStatus === "ok" ? (
