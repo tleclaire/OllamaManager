@@ -33,6 +33,13 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
     else inputRef.current?.blur();
   }, [inputFocused]);
 
+  // The chat target live-follows the models list: the marked entry (or, on a
+  // fresh boot before any onChange, the first entry) is what sends will use.
+  useEffect(() => {
+    const marked = selectedModel ?? models.getSnapshot().tags[0]?.name ?? null;
+    chat.setModel(marked);
+  }, [selectedModel, chat, models]);
+
   const effectiveModel = chatModel ?? selectedModel;
 
   return (

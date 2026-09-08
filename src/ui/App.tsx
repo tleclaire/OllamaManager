@@ -132,12 +132,9 @@ export function App({ runtime }: { runtime: Runtime }) {
       case "c":
         key.preventDefault();
         if (state.view === "main") {
+          // ChatView syncs its target model from the models list itself.
           if (state.chatOpen) ui.closeChat();
-          else {
-            const m = models.getSnapshot();
-            chat.setModel(m.selected ?? m.tags[0]?.name ?? null);
-            ui.openChat();
-          }
+          else ui.openChat();
         }
         return;
       case "r":
@@ -251,10 +248,6 @@ export function App({ runtime }: { runtime: Runtime }) {
           case "m":
             key.preventDefault();
             ui.openActionMenu(selected);
-            return;
-          case "return":
-            key.preventDefault();
-            ui.openDetails(selected);
             return;
           default:
             break;

@@ -73,8 +73,13 @@ export function ModelsPane({ models, ui, focused, width }: ModelsPaneProps) {
           focused={focused}
           options={options}
           onSelect={(_index, option) => {
+            // Enter on a highlighted entry: make it the chat target and open
+            // the chat pane (details stay reachable via the m actions menu).
             const name = (option?.value as string | undefined) ?? option?.name;
-            if (name) ui.openDetails(name);
+            if (name) {
+              models.select(name);
+              ui.openChat();
+            }
           }}
           onChange={(_index, option) => {
             const name = (option?.value as string | undefined) ?? option?.name;
