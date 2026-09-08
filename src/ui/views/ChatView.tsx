@@ -26,7 +26,7 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
   const chatModel = useStore(chat, (s) => s.model);
   const selectedModel = useStore(models, (s) => s.selected);
   const inputFocused = useStore(ui, (s) => s.textCapture);
-  const inputRef = useRef<{ focus(): void; blur(): void } | null>(null);
+  const inputRef = useRef<{ value: string; focus(): void; blur(): void } | null>(null);
 
   useEffect(() => {
     if (inputFocused) inputRef.current?.focus();
@@ -83,7 +83,7 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
         <text fg={theme.dim}>{inputFocused ? "›" : "› (Enter to focus)"}</text>
         <input
           ref={(r) => {
-            inputRef.current = (r as unknown as { focus(): void; blur(): void }) ?? null;
+            inputRef.current = (r as unknown as { value: string; focus(): void; blur(): void }) ?? null;
           }}
           focused={inputFocused}
           placeholder={effectiveModel ? "prompt…" : "select a model in the Models pane first (c opens chat)"}
@@ -93,8 +93,9 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
             if (prompt.length === 0) return;
             if (effectiveModel) chat.setModel(effectiveModel);
             void chat.send(prompt);
-            // Keep the input focused so the next prompt needs no re-focus;
-            // Esc still blurs on demand, and send() no-ops while streaming.
+            // Keep focus for the next prompt; clear the field (OpenTUI does
+            // not clear on submit). send() no-ops while streaming.
+            if (inputRef.current) inputRef.current.value = "";
           }}
           style={{ flexGrow: 1, flexBasis: 0 }}
         />

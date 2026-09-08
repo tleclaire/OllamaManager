@@ -55,6 +55,7 @@ export function PullView({ pull, ui }: PullViewProps) {
             if (name.length > 0) {
               pull.start(name);
               ui.setTextCapture(false);
+              if (inputRef.current) inputRef.current.value = "";
               inputRef.current?.blur();
             }
           }}
