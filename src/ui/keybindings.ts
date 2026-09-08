@@ -16,12 +16,12 @@ export const GLOBAL_KEYS: KeybindingRow[] = [
   { keys: "Enter", description: "Model details for selection", scope: "main, models focused" },
   { keys: "m", description: "Model actions (details/delete/copy/unload)", scope: "main, models focused" },
   { keys: "p", description: "Pull view (download a model)", scope: "main" },
-  { keys: "c", description: "Chat / benchmark view", scope: "any" },
+  { keys: "c", description: "Toggle chat pane (right column)", scope: "main" },
   { keys: "r", description: "Refresh models + running now", scope: "main" },
   { keys: "?", description: "Toggle this help overlay", scope: "any" },
   { keys: "q", description: "Quit", scope: "any" },
   { keys: "Ctrl+C", description: "Quit", scope: "any" },
-  { keys: "Esc", description: "Back to main / dismiss overlay", scope: "non-main" },
+  { keys: "Esc", description: "Back to main / close chat pane / dismiss overlay", scope: "any" },
 ];
 
 export const PANE_KEYS: KeybindingRow[] = [
@@ -37,7 +37,7 @@ export const VIEW_KEYS: KeybindingRow[] = [
   { keys: "Enter", description: "Send prompt / start pull / refocus input", scope: "Chat / Pull" },
   { keys: "a", description: "Abort stream / pull", scope: "Chat / Pull (input not focused)" },
   { keys: "b", description: "Run preset benchmark prompt", scope: "Chat (input not focused)" },
-  { keys: "Esc", description: "Blur input; press again to leave view", scope: "Chat / Pull / Details" },
+  { keys: "Esc", description: "Blur input; again closes chat pane / leaves view", scope: "Chat / Pull / Details" },
 ];
 
 /** All rows in help-overlay order. */

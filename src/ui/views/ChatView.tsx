@@ -1,6 +1,7 @@
 /**
- * Chat / benchmark panel (§4.8): transcript scrollbox, prompt input,
- * streaming indicator, TTFT/tok-s of the last run, benchmark trigger.
+ * Chat / benchmark pane (§4.8): right-hand column next to the main panes so
+ * Stats/Logs keep streaming while chatting. Transcript scrollbox, prompt
+ * input, streaming indicator, TTFT/tok-s of the last run, benchmark trigger.
  */
 import { useEffect, useRef } from "react";
 import { useStore } from "../../hooks/useStore";
@@ -36,12 +37,12 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
 
   return (
     <box
-      title={` Chat / Benchmark ${effectiveModel ? `· ${effectiveModel}` : "· no model selected"} `}
+      title={` Chat (c) ${inputFocused ? "▸ " : ""}${effectiveModel ? `· ${effectiveModel}` : "· no model selected"} `}
       borderStyle="double"
       border
-      borderColor={theme.borderFocused}
-      titleColor={theme.borderFocused}
-      style={{ flexGrow: 1, flexDirection: "column", padding: 1, gap: 1 }}
+      borderColor={inputFocused ? theme.borderFocused : theme.border}
+      titleColor={inputFocused ? theme.borderFocused : theme.border}
+      style={{ width: "34%", flexShrink: 0, flexDirection: "column", padding: 1, gap: 1 }}
     >
       <scrollbox focused={!inputFocused} stickyScroll stickyStart="bottom" style={{ flexGrow: 1, flexBasis: 0 }}>
         {messages.length === 0 && !current ? (

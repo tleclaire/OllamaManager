@@ -1,6 +1,6 @@
 # OllamaManager
 
-OllamaManager is a keyboard-driven terminal UI (TUI) for monitoring and managing a local Ollama instance. One screen combines three persistent panes — Models, Stats, and Logs — with toggle views for model details, pulling models, and chat/benchmark. It talks to the Ollama HTTP API on `127.0.0.1:11434`, streams the `ollama` systemd unit's journal, and reads GPU and process metrics beyond what the Ollama API exposes.
+OllamaManager is a keyboard-driven terminal UI (TUI) for monitoring and managing a local Ollama instance. One screen combines three persistent panes — Models, Stats, and Logs — with a chat pane to their right and toggle views for model details and pulling models. It talks to the Ollama HTTP API on `127.0.0.1:11434`, streams the `ollama` systemd unit's journal, and reads GPU and process metrics beyond what the Ollama API exposes.
 
 ## Features
 
@@ -8,7 +8,7 @@ OllamaManager is a keyboard-driven terminal UI (TUI) for monitoring and managing
 - Model pull with live progress bars and instant abort
 - Realtime log streaming from the `ollama` systemd unit (`journalctl -u ollama -f -o json`)
 - Realtime stats: tokens/s and time-to-first-token from the Ollama API, GPU utilization/memory/temperature via `nvidia-smi`, CPU/RAM of the server process via `/proc/<pid>`
-- Chat panel with streaming output, plus a one-key preset benchmark run that records TTFT and tok/s
+- Chat pane to the right of the main panes (Stats and Logs keep streaming while you chat), with streaming output and a one-key preset benchmark run that records TTFT and tok/s
 - Running-model overview (`GET /api/ps`) with 5 s polling
 - Help overlay (`?`) generated from the same keymap table the app uses — no drift between help and behavior
 - Graceful degradation: every external integration (API, journal, GPU, process stats) is optional or self-healing, and its status is always visible in the UI
@@ -63,7 +63,7 @@ Global:
 | `Enter` | Model details for selection | main, models focused |
 | `m` | Model actions (details/delete/copy/unload) | main, models focused |
 | `p` | Pull view (download a model) | main |
-| `c` | Chat / benchmark view | any |
+| `c` | Toggle chat pane (right column) | main |
 | `r` | Refresh models + running now | main |
 | `?` | Toggle help overlay | any |
 | `q` | Quit | any |
@@ -88,7 +88,7 @@ View-local:
 | `Enter` | Send prompt / start pull / refocus input | Chat / Pull |
 | `a` | Abort stream / pull | Chat / Pull (input not focused) |
 | `b` | Run preset benchmark prompt | Chat (input not focused) |
-| `Esc` | Blur input; press again to leave view | Chat / Pull / Details |
+| `Esc` | Blur input; again closes chat pane / leaves view | Chat / Pull / Details |
 
 ### Behavior notes
 

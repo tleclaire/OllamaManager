@@ -307,8 +307,8 @@ export function createRuntime(overrides?: {
 
 ### 4.8 `src/ui/` — React layer
 
-- **`App.tsx`** — shell: view switch (`main | chat | details | pull`), global `useKeyboard` handler, focus-pane state, runtime boot/teardown in `useEffect`, `useRenderer()` for clean quit (`renderer.destroy()`).
-- **View switch, not modal overlay** — when the user opens chat/details/pull, the main grid is replaced. Rationale: avoids depending on z-order/overlay behavior of a pre-1.0 library; streaming data continues updating in stores the whole time *(logs never stop flowing, they're just not on screen)*.
+- **`App.tsx`** — shell: view switch (`main | details | pull`) + chat pane flag (`chatOpen`), global `useKeyboard` handler, focus-pane state, runtime boot/teardown in `useEffect`, `useRenderer()` for clean quit (`renderer.destroy()`).
+- **View switch, not modal overlay** — details/pull replace the main grid; chat is a pane right of the main panes (v1.1 change from the original chat-as-view: user wants Stats/Logs visible while chatting). Toggle (not modal) rationale unchanged: avoids depending on z-order/overlay behavior of a pre-1.0 library; streaming data continues updating in stores the whole time *(logs never stop flowing)*.
 - **`keybindings.ts`** — single source of truth: keymap table + human-readable help lines (rendered by the help overlay). Rationale: keybinding drift between handler and help text is the classic TUI bug — one table prevents it.
 - **Panes** (`panes/`): `ModelsPane` (`<select>` focused by focus-pane state; shows size/params/quant + ● running indicator from `/api/ps`), `StatsPane` (GPU/CPU/RAM readouts, ▁▂▄▇ sparklines from series, running models with `expires_at`, ollama pid CPU/RSS), `LogsPane` (`<scrollbox focused stickyScroll stickyStart="bottom">` — the documented streaming-log pattern; manual scroll-up pauses stickiness, `g`/`End` jumps to bottom to re-stick).
 - **Views**: `PullView` (model-name `<input>`, start/abort, live per-pull progress bars with pct + MB), `DetailsView` (capabilities, parameters, template, modelfile in a scrollbox), `ChatView` (transcript, prompt `<input>`, streaming indicator, TTFT/tok-s of last + benchmark summary), `ConfirmDialog` (delete/copy confirmation — destructive ops are never single-keystroke).
@@ -329,7 +329,7 @@ Global (all views unless input is capturing text):
 | `m` | Model actions on selected model (details/delete/copy/unload) | main |
 | `Enter` | Model details for selected model | main (models focused) |
 | `p` | Pull view (download new model) | main |
-| `c` | Toggle chat/benchmark view | any |
+| `c` | Toggle chat pane (right column) | main |
 | `r` | Refresh models + running now | main |
 | `?` | Help overlay (keymap from `keybindings.ts`) | any |
 | `q` | Quit (clean `renderer.destroy()`) | any |
@@ -354,7 +354,7 @@ View-local:
 | `Enter` | Send prompt / start pull | Chat / Pull |
 | `a` | Abort stream / pull | Chat / Pull |
 | `b` | Run preset benchmark prompt | Chat |
-| `Esc` | (input focused) blur input; (else) leave view | Chat / Pull / Details |
+| `Esc` | (input focused) blur input; (else) close chat pane / leave view | Chat / Pull / Details |
 
 Rationale for `Esc`-twice in Chat: matches terminal-muscle-memory (vim-like), avoids trapping users in an input.
 
@@ -381,7 +381,7 @@ Rationale for `Esc`-twice in Chat: matches terminal-muscle-memory (vim-like), av
 └──────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Flex plan: root `<box flexDirection="column">`; top row `<box flexDirection="row" flexGrow={1}>` with Models pane `width="38%"`, Stats pane `flexGrow={1}`; Logs pane `flexGrow={1}` below; StatusBar fixed height 1. Borders `borderStyle="double"`, focused pane's border/title colored (yellow) *(focus must be visible at a glance; color is the cheapest signal)*. Chat view replaces the grid: transcript scrollbox (flexGrow 1) + stats strip + input row.
+Flex plan: root `<box flexDirection="column">`; top row `<box flexDirection="row" flexGrow={1}>` with Models pane `width="38%"`, Stats pane `flexGrow={1}`; Logs pane `flexGrow={1}` below; StatusBar fixed height 1. Borders `borderStyle="double"`, focused pane's border/title colored (yellow) *(focus must be visible at a glance; color is the cheapest signal)*. Chat pane: right column `width="34%"` inside the main row, transcript scrollbox + bench strip + input row. **Yoga rule (learned live): every `flexGrow` child needs `flexBasis: 0`** — with the default `auto`, scrollbox content height drives flex-shrink and collapses sibling panes.
 
 ---
 
@@ -572,7 +572,7 @@ Secondary risks: `CLK_TCK=100` assumption (mitigated: named constant, verify via
 | ADR-4 | Child processes via Bun.spawn argv-arrays, per-tick spawn for pollers | HIGH | long-lived `nvidia-smi -l`, shell strings |
 | ADR-5 | journalctl with backoff restart; ENOENT/EACCES are terminal states | HIGH | infinite restart (burns CPU on permanent failures) |
 | ADR-6 | Logs ring 5000 / series 150 / flush 100 ms | MEDIUM (tunable constants) | unbounded arrays, per-chunk renders |
-| ADR-7 | Toggle views (not modal overlays) for chat/details/pull | MEDIUM | modals (z-order behavior unverified in pre-1.0 lib) |
+| ADR-7 | Toggle views (not modal overlays) for details/pull; chat as right-hand pane (v1.1) | MEDIUM | modals (z-order behavior unverified in pre-1.0 lib) |
 | ADR-8 | GPU 2s / proc 2s / tags+ps 5s poll cadences | HIGH | faster (CPU waste) / slower (stale UI) |
 | ADR-9 | Chat TTFT = wall-clock to first non-empty response chunk; tok/s = eval_count/eval_duration | HIGH (API-verified) | token-estimation approaches |
 

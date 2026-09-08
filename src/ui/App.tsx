@@ -30,6 +30,7 @@ export function App({ runtime }: { runtime: Runtime }) {
   const { ui, models, logs, stats, pull, chat } = stores;
 
   const view = useStore(ui, (s) => s.view);
+  const chatOpen = useStore(ui, (s) => s.chatOpen);
   const focusPane = useStore(ui, (s) => s.focusPane);
   const helpOpen = useStore(ui, (s) => s.helpOpen);
   const confirmOpen = useStore(ui, (s) => s.confirm !== null);
@@ -116,14 +117,20 @@ export function App({ runtime }: { runtime: Runtime }) {
         if (state.view !== "main") {
           key.preventDefault();
           ui.backToMain();
+        } else if (state.chatOpen) {
+          key.preventDefault();
+          ui.closeChat();
         }
         return;
       case "c":
         key.preventDefault();
-        if (state.view === "chat") ui.backToMain();
-        else {
-          chat.setModel(models.getSnapshot().selected);
-          ui.openChat();
+        if (state.view === "main") {
+          if (state.chatOpen) ui.closeChat();
+          else {
+            const m = models.getSnapshot();
+            chat.setModel(m.selected ?? m.tags[0]?.name ?? null);
+            ui.openChat();
+          }
         }
         return;
       case "r":
@@ -132,7 +139,7 @@ export function App({ runtime }: { runtime: Runtime }) {
         void models.refreshRunning();
         return;
       case "a":
-        if (state.view === "chat") {
+        if (state.chatOpen) {
           key.preventDefault();
           chat.abort();
         } else if (state.view === "pull") {
@@ -141,15 +148,15 @@ export function App({ runtime }: { runtime: Runtime }) {
         }
         return;
       case "b":
-        if (state.view === "chat") {
+        if (state.chatOpen) {
           key.preventDefault();
           chat.setModel(models.getSnapshot().selected);
           void chat.runBenchmark();
         }
         return;
       case "return":
-        // Refocus the input in chat/pull when it was blurred.
-        if ((state.view === "chat" || state.view === "pull") && !state.textCapture) {
+        // Refocus the chat/pull input when it was blurred.
+        if ((state.chatOpen || state.view === "pull") && !state.textCapture) {
           key.preventDefault();
           ui.setTextCapture(true);
         }
@@ -254,18 +261,20 @@ export function App({ runtime }: { runtime: Runtime }) {
         // flexBasis: 0 on every flexGrow child is MANDATORY with Yoga: with the
         // default flexBasis "auto", a scrollbox's huge intrinsic content height
         // drives flex-shrink and collapses sibling panes to a single row.
-        <box style={{ flexDirection: "column", flexGrow: 1, flexBasis: 0 }}>
-          <box style={{ flexDirection: "row", flexGrow: 1, flexBasis: 0 }}>
-            <ModelsPane models={models} ui={ui} focused={mainFocused("models")} width="38%" />
-            <StatsPane stats={stats} models={models} focused={mainFocused("stats")} flexGrow={1} />
+        <box style={{ flexDirection: "row", flexGrow: 1, flexBasis: 0 }}>
+          <box style={{ flexDirection: "column", flexGrow: 1, flexBasis: 0 }}>
+            <box style={{ flexDirection: "row", flexGrow: 1, flexBasis: 0 }}>
+              <ModelsPane models={models} ui={ui} focused={mainFocused("models")} width="38%" />
+              <StatsPane stats={stats} models={models} focused={mainFocused("stats")} flexGrow={1} />
+            </box>
+            <LogsPane logs={logs} focused={mainFocused("logs")} flexGrow={1} scrollRef={logsScrollRef} />
           </box>
-          <LogsPane logs={logs} focused={mainFocused("logs")} flexGrow={1} scrollRef={logsScrollRef} />
+          {chatOpen ? <ChatView chat={chat} models={models} ui={ui} /> : null}
         </box>
       ) : null}
 
       {view === "pull" ? <PullView pull={pull} ui={ui} /> : null}
       {view === "details" ? <DetailsView models={models} ui={ui} /> : null}
-      {view === "chat" ? <ChatView chat={chat} models={models} ui={ui} /> : null}
 
       <StatusBar models={models} logs={logs} stats={stats} />
 

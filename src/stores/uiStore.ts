@@ -5,7 +5,7 @@
  */
 import { StoreBase } from "./base";
 
-export type ViewName = "main" | "chat" | "details" | "pull";
+export type ViewName = "main" | "details" | "pull";
 export type FocusPane = "models" | "stats" | "logs";
 
 export type ConfirmAction =
@@ -29,6 +29,8 @@ export type InputPromptRequest = {
 
 export type UiState = {
   view: ViewName;
+  /** Chat lives as a pane right of the main panes (open while view === "main"). */
+  chatOpen: boolean;
   focusPane: FocusPane;
   /** True while an <input> owns the keyboard — global hotkeys suppressed. */
   textCapture: boolean;
@@ -44,6 +46,7 @@ const PANE_ORDER: FocusPane[] = ["models", "stats", "logs"];
 
 const INITIAL_STATE: UiState = {
   view: "main",
+  chatOpen: false,
   focusPane: "models",
   textCapture: false,
   helpOpen: false,
@@ -67,7 +70,11 @@ export class UiStore extends StoreBase<UiState> {
   }
 
   openChat(): void {
-    this.update({ view: "chat", textCapture: false });
+    this.update({ view: "main", chatOpen: true, textCapture: true });
+  }
+
+  closeChat(): void {
+    this.update({ chatOpen: false, textCapture: false });
   }
 
   openPull(): void {
