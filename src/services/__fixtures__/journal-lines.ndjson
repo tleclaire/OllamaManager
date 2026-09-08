@@ -1,0 +1,8 @@
+{"__REALTIME_TIMESTAMP":"1757339221000000","PRIORITY":"6","_COMM":"ollama","MESSAGE":"time=2026-09-08T15:47:01.000+02:00 level=INFO source=gpu.go:201 msg=[GPU] compute 8.6 driver 595.84"}
+{"__REALTIME_TIMESTAMP":"1757339222000000","PRIORITY":"6","_COMM":"ollama","MESSAGE":"llama runner started"}
+{"__REALTIME_TIMESTAMP":"1757339223000000","PRIORITY":"4","_COMM":"ollama","MESSAGE":"metrics: deprecated request format"}
+{"__REALTIME_TIMESTAMP":"1757339224000000","PRIORITY":"3","_COMM":"ollama","MESSAGE":"error loading model: context window exceeded"}
+{"__REALTIME_TIMESTAMP":"1757339225000000","PRIORITY":"7","_COMM":"ollama","MESSAGE":"debug: timer tick"}
+NOT VALID JSON AT ALL
+{"PRIORITY":"6","MESSAGE":""}
+{"__REALTIME_TIMESTAMP":"1757339226000000","PRIORITY":"6","MESSAGE":"after garbage"}

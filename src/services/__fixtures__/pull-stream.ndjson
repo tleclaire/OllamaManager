@@ -1,0 +1,4 @@
+{"model":"qwen2.5:0.5b","created_at":"2026-09-08T15:00:00Z","response":"","done":false,"status":"pulling manifest"}
+{"model":"qwen2.5:0.5b","digest":"sha256:a8b0c5d6599769f0","total":397847329,"completed":100000000,"status":"pulling a8b0c5d6599769f0"}
+{"model":"qwen2.5:0.5b","digest":"sha256:a8b0c5d6599769f0","total":397847329,"completed":250000000,"status":"pulling a8b0c5d6599769f0"}
+{"model":"qwen2.5:0.5b","digest":"sha256:a8b0c5d6599769f0","total":397847329,"completed":397847329,"status":"success"}

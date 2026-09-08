@@ -1,0 +1,25 @@
+Name:	ollama
+Umask:	0022
+State:	S (sleeping)
+Tgid:	73805
+Ngid:	0
+Pid:	73805
+PPid:	1
+TracerPid:	0
+Uid:	997	997	997	997
+Gid:	997	997	997	997
+FDSize:	64
+Groups:	997
+NStgid:	73805
+NSpid:	73805
+NSpgid:	73805
+NSsid:	73805
+VmPeak:	 9123456 kB
+VmSize:	 9123456 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	 6400000 kB
+VmRSS:	 6390312 kB
+RssAnon:	 123456 kB
+Threads:	38
+SigPnd:	0000000000000000
