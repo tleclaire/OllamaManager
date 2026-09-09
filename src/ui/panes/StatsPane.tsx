@@ -41,6 +41,7 @@ export function StatsPane({ stats, models, focused, flexGrow }: StatsPaneProps) 
   const gpuUtilSpark = sparkline(gpuSeries.sliceLast(config.buffers.sparklinePoints).map((s) => s.utilPct));
   const cpuSpark = sparkline(cpuSeries.sliceLast(config.buffers.sparklinePoints));
   const lastBench = benchmarks[0];
+  const lastTokPerSecFor = (model: string) => benchmarks.find((b) => b.model === model)?.tokPerSec ?? null;
 
   return (
     <box
@@ -87,10 +88,15 @@ export function StatsPane({ stats, models, focused, flexGrow }: StatsPaneProps) 
           <span fg={theme.dim}>none loaded</span>
         ) : (
           <span fg={theme.text}>
-            {running
-              .slice(0, 2)
-              .map((r) => `${r.name}  VRAM ${formatBytes(r.size_vram)}  expires ${formatExpiry(r.expires_at, now)}`)
-              .join("  ·  ")}
+             {running
+               .slice(0, 2)
+               .map((r) => {
+                 const tokPerSec = lastTokPerSecFor(r.name);
+                 return `${r.name}  VRAM ${formatBytes(r.size_vram)}  ${
+                   tokPerSec !== null ? tokPerSec.toFixed(1) : "—"
+                 } tok/s  expires ${formatExpiry(r.expires_at, now)}`;
+               })
+               .join("  ·  ")}
           </span>
         )}
       </Row>
