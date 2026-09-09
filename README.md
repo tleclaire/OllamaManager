@@ -36,6 +36,16 @@ If Bun is not installed yet:
 curl -fsSL https://bun.sh/install | bash
 ```
 
+### Standalone binary (optional)
+
+Build a self-contained single binary (~96 MB, embeds the OpenTUI native library) and put it on your PATH:
+
+```bash
+bun run install:bin    # = bun run build + copy to ~/.local/bin/ollama-manager
+```
+
+Then start it from anywhere with `ollama-manager`. Re-run the command after code changes; `dist/` holds the build artifact.
+
 ## Usage
 
 Start the TUI:

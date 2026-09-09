@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "bun run --watch src/index.tsx",
     "start": "bun run src/index.tsx",
+    "build": "bun build --compile src/index.tsx --outfile dist/ollama-manager",
+    "install:bin": "bun run build && mkdir -p ~/.local/bin && cp dist/ollama-manager ~/.local/bin/",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
