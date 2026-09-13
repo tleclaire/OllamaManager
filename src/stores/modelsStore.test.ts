@@ -182,3 +182,51 @@ describe("ModelsStore — mutating actions refresh tags", () => {
     expect(store.getSnapshot().lastError).toContain("failed to delete");
   });
 });
+
+describe("ModelsStore — deterministic model order (ollama#12866)", () => {
+  const model = (name: string, modifiedAt: string): OllamaModel => ({ ...sampleModel(name), modified_at: modifiedAt });
+
+  test("newest first, regardless of the order the API returns", async () => {
+    const api = fakeApi({
+      listModels: [() => [model("old", "2026-09-13T15:24:25.290190466+02:00"), model("new", "2026-09-13T15:47:27.466124179+02:00")]],
+    });
+    const store = new ModelsStore({ api });
+    await store.refreshTags();
+    expect(store.getSnapshot().tags.map((m) => m.name)).toEqual(["new", "old"]);
+  });
+
+  test("identical timestamps fall back to a name tiebreak", async () => {
+    const ts = "2026-09-13T15:47:27.412105065+02:00";
+    const api = fakeApi({
+      listModels: [
+        () => [model("qwen3.5-9b-64k", ts), model("gemma4-12b-32k", ts), model("bge-large", ts)],
+      ],
+    });
+    const store = new ModelsStore({ api });
+    await store.refreshTags();
+    expect(store.getSnapshot().tags.map((m) => m.name)).toEqual(["bge-large", "gemma4-12b-32k", "qwen3.5-9b-64k"]);
+  });
+
+  test("every rotation of Ollama's unstable cycle yields the same list", async () => {
+    // The exact fixed cycle measured from a live /api/tags, all sharing one second.
+    const cycle = ["qwen3.5-9b-64k", "Qwen3.8-27B-8k", "qwen2.5-coder:14b-8k", "gemma4-12b-32k", "qwen2.5-coder-7b-32k", "bge-large"];
+    const rotations = cycle.map((_, i) => [...cycle.slice(i), ...cycle.slice(0, i)]);
+    const api = fakeApi({ listModels: rotations.map((r) => () => r.map((n) => model(n, "2026-09-13T15:47:27.4+02:00"))) });
+    const store = new ModelsStore({ api });
+    const results: string[][] = [];
+    for (let i = 0; i < rotations.length; i++) {
+      await store.refreshTags();
+      results.push(store.getSnapshot().tags.map((m) => m.name));
+    }
+    const canonical = results[0] ?? [];
+    for (const r of results) expect(r).toEqual(canonical);
+    expect(canonical).toEqual([...cycle].sort()); // name ascending
+  });
+
+  test("an unparsable modified_at is treated as oldest, not a crash", async () => {
+    const api = fakeApi({ listModels: [() => [model("broken", "not-a-date"), model("valid", "2026-09-13T15:47:27.4+02:00")]] });
+    const store = new ModelsStore({ api });
+    await store.refreshTags();
+    expect(store.getSnapshot().tags.map((m) => m.name)).toEqual(["valid", "broken"]);
+  });
+});

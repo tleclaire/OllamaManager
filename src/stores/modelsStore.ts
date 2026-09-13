@@ -33,6 +33,27 @@ export interface OllamaApiLike {
   unload(model: string): Promise<void>;
 }
 
+/**
+ * Canonical, deterministic model order.
+ *
+ * Ollama's `/api/tags` does NOT return a stable order: it sorts by `modified_at`,
+ * but models whose timestamps land in the same second tie, and the tie order
+ * falls back to Go map iteration — a random *rotation* of one fixed cycle. Measured
+ * on a live instance: 30 polls produced exactly 6 distinct orders, all rotations
+ * of the same 6-model cycle (upstream: ollama/ollama#12866 has no sorting at all).
+ * Since the store polls every 5s, that made the list visibly reshuffle. Sorting
+ * here gives every consumer (ModelsPane, chat picker, details) one stable order:
+ * newest first, name ascending as a deterministic tiebreak.
+ */
+export function compareModels(a: OllamaModel, b: OllamaModel): number {
+  const ta = Date.parse(a.modified_at);
+  const tb = Date.parse(b.modified_at);
+  const va = Number.isNaN(ta) ? 0 : ta;
+  const vb = Number.isNaN(tb) ? 0 : tb;
+  if (va !== vb) return vb - va; // newest first
+  return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+}
+
 export class ModelsStore extends StoreBase<ModelsState> {
   private readonly api: OllamaApiLike;
   private readonly timers: TimerDeps;
@@ -74,7 +95,7 @@ export class ModelsStore extends StoreBase<ModelsState> {
     if (this.inFlight.has("tags")) return; // previous cycle still running — skip, tick is the backoff
     this.inFlight.add("tags");
     try {
-      const tags = await this.api.listModels();
+      const tags = [...(await this.api.listModels())].sort(compareModels);
       this.update({ tags, apiStatus: "ok", lastError: undefined, lastRefresh: this.timers.now() });
     } catch (err) {
       this.recordError(err);
