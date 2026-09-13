@@ -268,9 +268,9 @@ export function App({ runtime }: { runtime: Runtime }) {
           <box style={{ flexDirection: "column", flexGrow: 1, flexBasis: 0 }}>
             <box style={{ flexDirection: "row", flexGrow: 1, flexBasis: 0 }}>
               <ModelsPane models={models} ui={ui} focused={mainFocused("models")} width="38%" />
-              <StatsPane stats={stats} models={models} focused={mainFocused("stats")} flexGrow={1} />
+              <StatsPane stats={stats} models={models} focused={mainFocused("stats")} flexGrow={1} onPaneClick={() => ui.setFocusPane("stats")} />
             </box>
-            <LogsPane logs={logs} focused={mainFocused("logs")} flexGrow={1} scrollRef={logsScrollRef} />
+            <LogsPane logs={logs} focused={mainFocused("logs")} flexGrow={1} scrollRef={logsScrollRef} onPaneClick={() => ui.setFocusPane("logs")} />
           </box>
           {chatOpen ? <ChatView chat={chat} models={models} ui={ui} /> : null}
         </box>

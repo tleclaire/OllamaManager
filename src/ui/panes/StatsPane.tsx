@@ -14,6 +14,7 @@ interface StatsPaneProps {
   models: ModelsStore;
   focused: boolean;
   flexGrow: number;
+  onPaneClick?: () => void;
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -25,7 +26,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-export function StatsPane({ stats, models, focused, flexGrow }: StatsPaneProps) {
+export function StatsPane({ stats, models, focused, flexGrow, onPaneClick }: StatsPaneProps) {
   const gpu = useStore(stats, (s) => s.gpu);
   const gpuStatus = useStore(stats, (s) => s.gpuStatus);
   const gpuDetail = useStore(stats, (s) => s.gpuDetail);
@@ -48,6 +49,7 @@ export function StatsPane({ stats, models, focused, flexGrow }: StatsPaneProps) 
       title={` Stats (2) ${focused ? "▸" : ""} `}
       borderStyle="double"
       border
+      onMouseDown={onPaneClick ? () => onPaneClick() : undefined}
       {...paneBorder(focused)}
       style={{ flexGrow, flexBasis: 0, flexDirection: "column", paddingLeft: 1, paddingRight: 1 }}
     >

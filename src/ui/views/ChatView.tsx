@@ -3,7 +3,7 @@
  * Stats/Logs keep streaming while chatting. Transcript scrollbox, prompt
  * input, streaming indicator, TTFT/tok-s of the last run, benchmark trigger.
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "../../hooks/useStore";
 import type { ChatStore } from "../../stores/chatStore";
 import type { ModelsStore } from "../../stores/modelsStore";
@@ -15,6 +15,24 @@ interface ChatViewProps {
   chat: ChatStore;
   models: ModelsStore;
   ui: UiStore;
+}
+
+function KnightRider({ width = 15, delayMs = 80 }: { width?: number; delayMs?: number }) {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setTick((n) => (n + 1) % (2 * (width - 2))), delayMs);
+    return () => clearInterval(timer);
+  }, [width, delayMs]);
+  const period = 2 * (width - 2);
+  let pos = tick % period;
+  if (pos > width - 2) pos = period - pos;
+  return (
+    <text>
+      <span fg={theme.dim}>{`${"·".repeat(pos)}`}</span>
+      <span fg={theme.warn}>{`▌▌`}</span>
+      <span fg={theme.dim}>{`${"·".repeat(width - pos - 2)}`}</span>
+    </text>
+  );
 }
 
 export function ChatView({ chat, models, ui }: ChatViewProps) {
@@ -49,9 +67,19 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
       border
       borderColor={inputFocused ? theme.borderFocused : theme.border}
       titleColor={inputFocused ? theme.borderFocused : theme.border}
+      onMouseDown={() => ui.setTextCapture(true)}
       style={{ width: "34%", flexShrink: 0, flexDirection: "column", padding: 1, gap: 1 }}
     >
-      <scrollbox focused={!inputFocused} stickyScroll stickyStart="bottom" style={{ flexGrow: 1, flexBasis: 0 }}>
+      <scrollbox
+        focused={!inputFocused}
+        stickyScroll
+        stickyStart="bottom"
+        onMouseDown={(e: { stopPropagation(): void }) => {
+          e.stopPropagation();
+          ui.setTextCapture(false);
+        }}
+        style={{ flexGrow: 1, flexBasis: 0 }}
+      >
         {messages.length === 0 && !current ? (
           <text fg={theme.dim}>
             Type a prompt and press Enter. Press Esc to blur the input, then `a` aborts, `b` runs the preset benchmark.
@@ -86,8 +114,15 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
         {streaming ? "  · streaming…" : ""}
       </text>
 
-      <box style={{ flexDirection: "row", gap: 1 }}>
-        <text fg={theme.dim}>{inputFocused ? "›" : "› (Enter to focus)"}</text>
+      <text>
+        <span fg={theme.accent}>{`chat`}</span>
+        <span fg={theme.dim}>{` · `}</span>
+        <span fg={theme.text}>{effectiveModel ?? "no model selected"}</span>
+        <span fg={theme.dim}>{` ·  OllamaManager`}</span>
+      </text>
+
+      <box style={{ flexDirection: "row" }}>
+        <text fg={inputFocused ? theme.accent : theme.dim}>{`▌`}</text>
         <input
           ref={(r) => {
             inputRef.current = (r as unknown as { value: string; focus(): void; blur(): void }) ?? null;
@@ -106,6 +141,16 @@ export function ChatView({ chat, models, ui }: ChatViewProps) {
           }}
           style={{ flexGrow: 1, flexBasis: 0 }}
         />
+      </box>
+
+      <box style={{ flexDirection: "row" }}>
+        {streaming ? (
+          <KnightRider />
+        ) : (
+          <text fg={theme.dim}>{`ready`}</text>
+        )}
+        <box style={{ flexGrow: 1, flexBasis: 0 }} />
+        <text fg={theme.dim}>{`esc blur · a abort`}</text>
       </box>
     </box>
   );

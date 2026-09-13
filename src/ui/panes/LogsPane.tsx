@@ -15,6 +15,7 @@ interface LogsPaneProps {
   flexGrow: number;
   /** Forwarded to App's global key handler for g/End re-stick. */
   scrollRef: { current: ScrollBoxRef | null };
+  onPaneClick?: () => void;
 }
 
 type ScrollBoxRef = {
@@ -36,7 +37,7 @@ function levelStyle(level: string): { label: string; color: string } {
   }
 }
 
-export function LogsPane({ logs, focused, flexGrow, scrollRef }: LogsPaneProps) {
+export function LogsPane({ logs, focused, flexGrow, scrollRef, onPaneClick }: LogsPaneProps) {
   const entries = useStore(logs, (s) => s.entries);
   const journalStatus = useStore(logs, (s) => s.journalStatus);
   const journalDetail = useStore(logs, (s) => s.journalDetail);
@@ -50,6 +51,7 @@ export function LogsPane({ logs, focused, flexGrow, scrollRef }: LogsPaneProps) 
       title={` Logs (3) ${focused ? "▸" : ""} `}
       borderStyle="double"
       border
+      onMouseDown={onPaneClick ? () => onPaneClick() : undefined}
       {...paneBorder(focused)}
       style={{ flexGrow, flexBasis: 0, flexDirection: "column" }}
     >
